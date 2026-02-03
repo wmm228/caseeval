@@ -1,91 +1,91 @@
 # prompts/gjmz.py
-# 纲举目张法提示模板（两阶段）
+# Outline-Detail (GJMZ) Method Prompt Template (Two Stages)
 
-GJMZ_STAGE1_PROMPT = '''你是一名计算学科教学案例架构师，擅长基于"抽象—理论—设计"三形态规划案例结构，能够将学科知识点转化为可教学、可评测的结构化框架，并将专业品行融入建模、论证与工程实现的全过程。
+GJMZ_STAGE1_PROMPT = '''You are a computing teaching case architect, specializing in planning case structure based on the "Abstraction-Theory-Design" three-form structure. You can transform subject knowledge points into teachable and evaluable structured frameworks, and integrate professional conduct into the entire process of modeling, argumentation, and engineering implementation.
 
-请根据输入的学科领域与案例选题，参考高水平专家案例的结构与深度，生成一份结构化的案例纲要。
+Please generate a structured case outline based on the input subject domain and case topic, referring to the structure and depth of high-level expert cases.
 
-【纲要格式】
+【Outline Format】
 
-## 1. 教学目标
-- 知识维度：（从事实性知识/概念性知识/程序性知识/元认知知识中选1个）
-- 认知维度：（从记忆/理解/应用/分析/评估/创造中选1个）
-- 能力产出：列出3项可观察、可评价的能力（用动词开头）
+## 1. Teaching Objectives
+- Knowledge Dimension: (Select 1 from Factual/Conceptual/Procedural/Metacognitive Knowledge)
+- Cognitive Dimension: (Select 1 from Remember/Understand/Apply/Analyze/Evaluate/Create)
+- Capability Output: List 3 observable and evaluable capabilities (Start with verbs)
 
-## 2. 抽象形态
-- 问题场景：（一句话描述真实场景）
-- 输入/输出/约束/目标：（各一句话）
-- 形式模型：Model = (元素1, 元素2, ...)
-- 各元素含义：（每个元素一句话）
-- 是否需要算法过程：是/否
+## 2. Abstraction Form
+- Problem Scenario: (One sentence describing the real scenario)
+- Input/Output/Constraints/Goal: (One sentence for each)
+- Formal Model: Model = (Element 1, Element 2, ...)
+- Meaning of each element: (One sentence for each element)
+- Whether algorithm process is needed: Yes/No
 
-## 3. 理论形态
-- 是否需要形式化论证：是/否
-- 核心原理：（一句话）
-- 若需要形式化论证：
-    - 前提/公理：（列出条目）
-    - 命题/定理：（列出核心结论）
-    - 证明思路：（一句话）
-    - 复杂度：时间O(?)，空间O(?)
-- 若不需要形式化论证：
-    - 论证要点：（列出）
-    - 适用边界：（说明）
+## 3. Theory Form
+- Whether formal argumentation is needed: Yes/No
+- Core Principle: (One sentence)
+- If formal argumentation is needed:
+    - Premises/Axioms: (List items)
+    - Propositions/Theorems: (List core conclusions)
+    - Proof Idea: (One sentence)
+    - Complexity: Time O(?), Space O(?)
+- If formal argumentation is not needed:
+    - Argumentation Points: (List items)
+    - Applicable Boundaries: (Explain)
 
-## 4. 设计形态
-- 是否需要Python代码：是/否
-- 需求分析：（列出4条：功能/性能/边界/安全或伦理）
-- 实现要点：（核心模块/函数/类名称）
-- 测试要点：（正常/边界/异常各1条）
+## 4. Design Form
+- Whether Python code is needed: Yes/No
+- Requirement Analysis: (List 4 items: Function/Performance/Boundary/Security or Ethics)
+- Implementation Points: (Core Module/Function/Class Names)
+- Testing Points: (1 item each for Normal/Boundary/Abnormal)
 
-## 5. 专业品行
-- 选定品行：（列出3-5个）
-- 体现环节：（每个品行对应建模/论证/实现/测试/复盘中的哪个）
-- 评价方式：（每个品行的评价方式）
+## 5. Professional Conduct
+- Selected Conduct: (List 3-5 items)
+- Embodiment Link: (Which one of Modeling/Argumentation/Implementation/Testing/Review corresponds to each conduct)
+- Evaluation Method: (Evaluation method for each conduct)
 
-## 6. 激励、唤醒和鼓励
-- 可执行路径：（列出3条）
-- 课堂组织方式：（建议）
+## 6. Ways to Motivate, Awaken, and Encourage
+- Executable Paths: (List 3 items)
+- Classroom Organization Method: (Suggestion)
 
-## 7. 习题
-- 模型扩展题：方向是___
-- 质疑假设题：方向是___
-- 工程权衡题：方向是___
-- 伦理合规题：方向是___
-- 实验设计题：方向是___
+## 7. Exercises
+- Model Extension Question: Direction is ___
+- Questioning Assumption Question: Direction is ___
+- Engineering Trade-off Question: Direction is ___
+- Ethics Compliance Question: Direction is ___
+- Experimental Design Question: Direction is ___
 
-【参考案例（参考其结构深度与内容粒度来规划纲要）】
-学科领域：{example_domain}
-案例选题：{example_topic}
-案例内容：
+【Reference Case (Refer to its structure depth and content granularity to plan the outline)】
+Domain: {example_domain}
+Case Topic: {example_topic}
+Case Content:
 {example_content}
 
-【输入】
-学科领域：{domain}
-案例选题：{topic}
+【Input】
+Domain: {domain}
+Case Topic: {topic}
 
-只输出纲要，不要任何解释。'''
+Output only the outline, without any explanation.'''
 
 
-GJMZ_STAGE2_PROMPT = '''你是一名计算学科教学案例撰写专家，擅长基于"抽象—理论—设计"三形态组织案例内容，能够将研究问题转化为可教学、可评测的结构化案例，并将专业品行贯穿于建模、论证与工程实现的全过程。
+GJMZ_STAGE2_PROMPT = '''You are an expert in writing computing teaching cases, specializing in organizing case content based on the "Abstraction-Theory-Design" three-form structure. You can transform research problems into teachable and evaluable structured cases, and integrate professional conduct into the entire process of modeling, argumentation, and engineering implementation.
 
-请根据提供的【案例纲要】，严格按照纲要中的每一项设计决策，展开撰写完整的教学案例。
+Please strictly follow every design decision in the provided 【Case Outline】 to expand and write a complete teaching case.
 
-你必须严格模仿【参考案例】的写作风格、表达方式、段落结构和内容深度。参考案例是高水平专家撰写的标杆，你的输出应在结构、风格、专业性上与其高度一致。
+You must strictly imitate the writing style, expression, paragraph structure, and content depth of the 【Reference Case】. The reference case is a benchmark written by high-level experts, and your output should be highly consistent with it in structure, style, and professionalism.
 
-【参考案例】
-学科领域：{example_domain}
-案例选题：{example_topic}
-案例内容：
+【Reference Case】
+Domain: {example_domain}
+Case Topic: {example_topic}
+Case Content:
 {example_content}
 
-【输入】
-学科领域：{domain}
-案例选题：{topic}
+【Input】
+Domain: {domain}
+Case Topic: {topic}
 
-【案例纲要】
+【Case Outline】
 {outline}
 
-只输出案例正文，不要任何解释。'''
+Output only the case text, without any explanation.'''
 
 
 def get_gjmz_stage1_prompt(domain: str, topic: str, example_domain: str, example_topic: str, example_content: str) -> str:

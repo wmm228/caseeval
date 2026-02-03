@@ -18,7 +18,7 @@ def main():
             
             # Add Example Topic first
             if domain_key in EXAMPLE_TOPICS:
-                out_f.write(f"【专家案例】{EXAMPLE_TOPICS[domain_key]}\n")
+                out_f.write(f"【Expert Example】{EXAMPLE_TOPICS[domain_key]}\n")
 
             if os.path.exists(topic_file):
                 with open(topic_file, "r", encoding="utf-8") as f:

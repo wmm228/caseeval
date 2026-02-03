@@ -1,78 +1,78 @@
 # prompts/cot.py
-# 思维链提示模板
+# Chain-of-Thought Prompt Template
 
-COT_PROMPT = '''你是一名计算学科教学案例撰写专家，擅长基于"抽象—理论—设计"三形态组织案例内容，将研究问题转化为可教学、可评测的结构化案例，并将案例内容与专业品行贯穿于建模、论证与设计实现全过程。
+COT_PROMPT = '''You are an expert in writing computing teaching cases, specializing in organizing case content based on the "Abstraction-Theory-Design" three-form structure. You can transform research problems into teachable and evaluable structured cases, and integrate professional conduct into the entire process of modeling, argumentation, and design implementation.
 
-案例必须包含以下部分（标题必须一致、顺序不变）：
+The case must include the following parts (titles must be consistent and in fixed order):
 
-1. 教学目标
-2. 本案例中的抽象、理论和设计三形态
-3. 专业品行
-4. 激励、唤醒和鼓励同学们向上的途径
-5. 习题
+1. Teaching Objectives
+2. Three Forms of Abstraction, Theory, and Design in this Case
+3. Professional Conduct
+4. Ways to Motivate, Awaken, and Encourage Students
+5. Exercises
 
-[思维链]
-请先按步骤逐步思考，再输出最终案例正文。让我们一步一步思考。
+[Chain of Thought]
+Please think step-by-step before outputting the final case text. Let's think step by step.
 
-步骤1 教学目标
-- 从 Bloom知识维度中选择 X
-- 从 Bloom认知维度中选择 Y
-- 拟定"教学目标"一句话，体现X与Y
-- 明确本案例的能力产出（建模/论证/设计实现中的哪一种或组合）
+Step 1: Teaching Objectives
+- Select X from Bloom Knowledge Dimensions
+- Select Y from Bloom Cognitive Dimensions
+- Formulate a one-sentence "Teaching Objective" embodying X and Y
+- Clarify the capability output of this case (Modeling/Argumentation/Design Implementation or combination)
 
-步骤2 抽象形态
-- 用一句话概括真实场景与需求背景
-- 明确输入、输出、约束、目标
-- 设计形式模型多元组：Model = (...)
-- 为每个元素写出含义、范围与约束要点
-- 若需要算法过程/步骤，列出关键步骤并确保变量与Model一致
+Step 2: Abstraction Form
+- Summarize the real scenario and requirement background in one sentence
+- Clarify input, output, constraints, and goals
+- Design formal model tuple: Model = (...)
+- Write down meaning, range, and constraint points for each element
+- If algorithm process/steps are needed, list key steps and ensure variables are consistent with Model
 
-步骤3 理论形态
-- 判断是否需要形式化论证（是/否）
-- 给出支撑概念模型的核心原理要点
-- 若"是"：列出Definition/Assumption/Theorem/Proof要写的主线与关键结论，并说明复杂度分析依赖的关键变量
-- 若"否"：列出论证要点、适用边界与可能的代价/复杂度口径
+Step 3: Theory Form
+- Determine if formal argumentation is needed (Yes/No)
+- Provide core principle points supporting the conceptual model
+- If "Yes": List the main line and key conclusions for Definition/Assumption/Theorem/Proof, and explain key variables for complexity analysis
+- If "No": List argumentation points, applicable boundaries, and possible cost/complexity caliber
 
-步骤4 设计形态
-- 判断是否需要 Python 交付（是/否）
-- 需求分析要点：功能、约束与验收方式
-- 实现方案要点：模块/关键函数/数据结构或工程交付物清单
-- 测试思路要点：正常/边界/异常三类至少各1条
-- 若"是"：计划给出的Python实现与测试样例覆盖点
+Step 4: Design Form
+- Determine if Python delivery is needed (Yes/No)
+- Requirement analysis points: Functions, constraints, and acceptance methods
+- Implementation plan points: Modules/Key functions/Data structures or engineering deliverable list
+- Testing idea points: At least 1 item each for Normal/Boundary/Abnormal
+- If "Yes": Plan the Python implementation and test case coverage points
 
-步骤5 专业品行
-- 从CS2023品行列表中确定最终 3–5 个
-- 为每个品行写出体现环节（建模/论证/实现/测试/复盘）
-- 为每个品行写出可评价方式要点（检查清单、代码审查点、可复现实验等）
-- 列出学生常见问题与改进抓手要点
+Step 5: Professional Conduct
+- Determine final 3–5 items from CS2023 Conduct List
+- Write down embodiment links (Modeling/Argumentation/Implementation/Testing/Review) for each conduct
+- Write down evaluation method points (Checklist, Code review points, Reproducible experiments, etc.) for each conduct
+- List student common problems and improvement handle points
 
-步骤6 激励、唤醒和鼓励同学们向上的途径
-- 列出至少 3 条可执行做法，并分别绑定到本选题的具体环节
-- 至少 1 条将社会责任/伦理/合规与工程取舍绑定到本选题
-- 给出课堂组织方式要点（讨论、对比实验、复盘等）
+Step 6: Ways to Motivate, Awaken, and Encourage Students
+- List at least 3 executable practices, and bind them to specific links of this topic respectively
+- Bind at least 1 item of social responsibility/ethics/compliance and engineering trade-offs to this topic
+- Provide classroom organization method points (Discussion, Comparative experiment, Review, etc.)
 
-步骤7 习题
-- 列出至少 5 个开放性题目要点
-- 题目覆盖：模型扩展、质疑假设、工程权衡、伦理合规、实验设计
-- 为每题写一句评价关注点（看什么而不是唯一答案）
+Step 7: Exercises
+- List at least 5 open-ended question points
+- Question coverage: Model extension, Questioning assumptions, Engineering trade-offs, Ethics compliance, Experimental design
+- Write a one-sentence evaluation focus for each question (Look at what, rather than a unique answer)
 
-[/思维链]
+[/Chain of Thought]
 
-Bloom知识维度：事实性知识、概念性知识、程序性知识、元认知知识
+Bloom Knowledge Dimensions: Factual Knowledge, Conceptual Knowledge, Procedural Knowledge, Metacognitive Knowledge
 
-Bloom认知维度：记忆、理解、应用、分析、评估、创造
+Bloom Cognitive Dimensions: Remember, Understand, Apply, Analyze, Evaluate, Create
 
-CS2023 品行列表：坚持不懈、主动性、协作、有效沟通、自主学习、责任感、适应性、创新性、严谨性、敏捷应对、创造性
+CS2023 Conduct List: Perseverance, Initiative, Collaboration, Effective Communication, Self-directed Learning, Responsibility, Adaptability, Innovation, Rigor, Agility, Creativity
 
-专家案例示例（仅用于学习结构，不得照抄内容）：
-学科领域：{example_domain}
-案例选题：{example_topic}
-案例内容：
+Expert Example (For structure learning only, do not copy content):
+Domain: {example_domain}
+Case Topic: {example_topic}
+Case Content:
 {example_content}
 
-请根据以下输入生成教学案例。只输出最终案例正文，不输出任何解释或推理过程。
-学科领域：{domain}
-案例选题：{topic}'''
+Please generate a teaching case based on the following input. Output only the final case text, without any explanation or reasoning process.
+Domain: {domain}
+Case Topic: {topic}'''
 
 
 def get_cot_prompt(domain: str, topic: str, example_domain: str, example_topic: str, example_content: str) -> str:

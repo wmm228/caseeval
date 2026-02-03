@@ -1,128 +1,133 @@
-# 教学案例生成器
+# Teaching Case Generator
 
-## 项目结构
+## Dataset Access
+
+You can access the generated teaching cases and related resources via the following link:
+[Google Drive Folder](https://drive.google.com/drive/folders/11U79vXjey2yFRTrjCq8iV3sZbuVDizKr?usp=drive_link)
+
+## Project Structure
 
 ```
 case_generator/
-├── config.py                 # 配置文件（API密钥、模型列表、领域映射）
-├── generator.py              # 主生成脚本
-├── test_api.py               # API测试脚本
-├── prompts/                  # 提示模板
+├── config.py                 # Configuration file (API keys, model list, domain mapping)
+├── generator.py              # Main generation script
+├── test_api.py               # API testing script
+├── prompts/                  # Prompt templates
 │   ├── __init__.py
-│   ├── simple.py            # 简单提示（不含专家案例）
-│   ├── cot.py               # 思维链提示
-│   └── gjmz.py              # 纲举目张法（两阶段）
-├── data/                     # 领域和选题数据
+│   ├── simple.py            # Simple prompt (without expert examples)
+│   ├── cot.py               # Chain-of-Thought prompt
+│   └── gjmz.py              # Outline-Detail (GJMZ) method (Two-stage)
+├── data/                     # Domain and topic data
 │   ├── SE/SE.txt
 │   ├── AI/AI.txt
 │   ├── Algorithm/Algorithm.txt
 │   ├── Architecture/Architecture.txt
 │   ├── DataManagement/DataManagement.txt
 │   └── Society/Society.txt
-├── examples/                 # 专家案例（每个领域一个）
+├── examples/                 # Expert examples (one per domain)
 │   ├── SE_example.md
 │   ├── AI_example.md
 │   ├── Algorithm_example.md
 │   ├── Architecture_example.md
 │   ├── DataManagement_example.md
 │   └── Society_example.md
-└── outputs/                  # 生成结果
-    └── {model}/              # 按模型分
+└── outputs/                  # Generation results
+    └── {model}/              # Grouped by model
         ├── {domain}_summary.json
-        ├── simple/{domain}/  # 简单提示结果
-        ├── cot/{domain}/     # 思维链结果
-        └── gjmz/{domain}/    # 纲举目张结果
+        ├── simple/{domain}/  # Simple prompt results
+        ├── cot/{domain}/     # Chain-of-Thought results
+        └── gjmz/{domain}/    # Outline-Detail results
 ```
 
-## 快速开始
+## Quick Start
 
-### 1. 配置API密钥
+### 1. Configure API Key
 
-编辑 `config.py`，填入你的API密钥：
+Edit `config.py` and enter your API key:
 
 ```python
-API_KEY = "你的API_KEY"
+API_KEY = "YOUR_API_KEY"
 ```
 
-### 2. 准备专家案例
+### 2. Prepare Expert Examples
 
-将专家案例文件重命名并放入 `examples/` 目录：
-- `SE_example.md` - 软件工程
-- `AI_example.md` - 人工智能
-- `Algorithm_example.md` - 算法基础
-- `Architecture_example.md` - 体系结构与组织
-- `DataManagement_example.md` - 数据管理
-- `Society_example.md` - 社会、伦理与职业化
+Rename and place expert example files into the `examples/` directory:
+- `SE_example.md` - Software Engineering
+- `AI_example.md` - Artificial Intelligence
+- `Algorithm_example.md` - Algorithmic Foundations
+- `Architecture_example.md` - Architecture and Organization
+- `DataManagement_example.md` - Data Management
+- `Society_example.md` - Society, Ethics and Professionalism
 
-### 3. 测试API连接
+### 3. Test API Connection
 
 ```bash
 python test_api.py
 ```
 
-### 4. 生成案例
+### 4. Generate Cases
 
 ```bash
-# 测试单个案例
-python generator.py --domain SE --topic "日历生成器" --model qwen
+# Test a single case
+python generator.py --domain SE --topic "Calendar Generator" --model qwen
 
-# 生成一个领域的所有案例
+# Generate all cases for a domain
 python generator.py --domain SE --model qwen --all
 
-# 查看选题列表
+# List topics
 python generator.py --domain SE --list-topics
 ```
 
-## 命令参数
+## Command Arguments
 
-| 参数 | 说明 | 可选值 |
-|------|------|--------|
-| `--domain` | 领域代码 | SE, AI, Algorithm, Architecture, DataManagement, Society |
-| `--topic` | 案例选题 | 对应领域txt文件中的选题名 |
-| `--model` | 模型代码 | qwen, ernie, hunyuan, doubao, minimax, glm |
-| `--all` | 生成该领域所有案例 | 无需值 |
-| `--list-topics` | 列出选题 | 无需值 |
+| Argument | Description | Options |
+|----------|-------------|---------|
+| `--domain` | Domain code | SE, AI, Algorithm, Architecture, DataManagement, Society |
+| `--topic` | Case topic | Topic name corresponding to the domain txt file |
+| `--model` | Model code | qwen, ernie, hunyuan, doubao, minimax, glm |
+| `--all` | Generate all cases for the domain | No value required |
+| `--list-topics` | List topics | No value required |
 
-## 三种提示方法
+## Three Prompting Methods
 
-| 方法 | 说明 | 是否使用专家案例 |
-|------|------|------------------|
-| simple | 简单提示，只有写作要求 | ❌ 不使用 |
-| cot | 思维链提示，分步思考 | ✅ 使用 |
-| gjmz | 纲举目张法，两阶段生成 | ✅ 使用 |
+| Method | Description | Uses Expert Example |
+|--------|-------------|---------------------|
+| simple | Simple prompt, only writing requirements | ❌ No |
+| cot | Chain-of-Thought prompt, step-by-step thinking | ✅ Yes |
+| gjmz | Outline-Detail (GJMZ) method, two-stage generation | ✅ Yes |
 
-## 输出结构
+## Output Structure
 
 ```
 outputs/
-└── qwen/                           # 模型名
-    ├── SE_summary.json             # 领域汇总
-    ├── simple/                     # 方法
-    │   └── SE/                     # 领域
-    │       ├── 日历生成器.md
+└── qwen/                           # Model name
+    ├── SE_summary.json             # Domain summary
+    ├── simple/                     # Method
+    │   └── SE/                     # Domain
+    │       ├── Calendar Generator.md
     │       └── ...
     ├── cot/
     │   └── SE/
     │       └── ...
     └── gjmz/
         └── SE/
-            ├── 日历生成器_outline.md  # 纲要
-            ├── 日历生成器.md          # 完整案例
+            ├── Calendar Generator_outline.md  # Outline
+            ├── Calendar Generator.md          # Complete case
             └── ...
 ```
 
-## Token统计
+## Token Statistics
 
-每次生成都会统计Token使用量，批量生成完成后会输出汇总：
+Token usage is counted for each generation, and a summary is output after batch generation:
 
 ```
-Token统计: 输入=12345 | 输出=67890 | 总计=80235
+Token Statistics: Input=12345 | Output=67890 | Total=80235
 ```
 
-## 可用模型
+## Available Models
 
-| 代码 | 模型名称 |
-|------|----------|
+| Code | Model Name |
+|------|------------|
 | qwen | qwen-plus |
 | ernie | ernie-4.0-8k |
 | hunyuan | hunyuan-pro |
@@ -130,8 +135,8 @@ Token统计: 输入=12345 | 输出=67890 | 总计=80235
 | minimax | minimax-abab6.5s-chat |
 | glm | glm-4-plus |
 
-## 注意事项
+## Notes
 
-1. 确保专家案例文件名与 `config.py` 中的 `EXAMPLE_FILES` 映射一致
-2. 批量生成时会自动添加1秒间隔避免请求过快
-3. 生成失败会自动重试3次，每次间隔递增
+1. Ensure expert example filenames match the `EXAMPLE_FILES` mapping in `config.py`.
+2. Batch generation automatically adds a 1-second interval to avoid rate limits.
+3. Failed generations automatically retry 3 times with increasing intervals.

@@ -1,164 +1,163 @@
 # prompts/eval.py
 
-EVAL_PROMPT = '''你是一名计算学科教学案例质量评估专家。你将根据下方提供的评分标准对一份教学案例进行打分。
+EVAL_PROMPT = '''You are a computing teaching case quality assessment expert. You will score a teaching case based on the grading criteria provided below.
 
-评分范围：每个维度 1-5 分的整数。
+Scoring Range: Integer 1-5 for each dimension.
 
-评估维度（从上到下依次为 6 个分数）：
-1. 结构一致性
-2. 主题相关性
-3. 内容清晰性
-4. 概念完备性（对应抽象形态）
-5. 理论准确性（对应理论形态）
-6. 设计可行性（对应设计形态）
+Assessment Dimensions (6 scores in order from top to bottom):
+1. Structure Consistency
+2. Topic Relevance
+3. Content Clarity
+4. Concept Completeness (Corresponding to Abstraction Form)
+5. Theory Correctness (Corresponding to Theory Form)
+6. Design Feasibility (Corresponding to Design Form)
 
-案例标准结构（教学案例必须严格包含以下 6 个部分）：
-1. 教学目标
-   - 必须包含 Bloom 分类法中的知识维度：事实性知识、概念性知识、程序性知识、元认知知识（缺一不可）。
-   - 必须包含 Bloom 分类法中的认知维度：记忆、理解、应用、分析、评估、创造（缺一不可）。
-2. 本案例中的抽象、理论和设计三形态（核心部分，必须详细展开）
-   2.1 抽象形态
-       - 问题描述：必须有，是对选题的深入讨论（应用场景/背景/研究问题），仅有一两句话的描述视为不合格。
-       - 形式模型：必须有，针对研究问题抽象出的形式多元组（必须是多元组形式，如 (S, I, O, C)），且每个元素的含义必须定义清晰。
-       - 算法过程（可选）：若涉及算法，必须包含完整的伪代码或步骤描述，仅列出关键步骤视为不完整。
-   2.2 理论形态
-       - 一般包括：原理引用、定理证明、数学公式（必须有推导过程）。
-       - 复杂度分析：如果有算法过程，则必须有详细的时间复杂度和空间复杂度分析（检查公式/定理的正确性及必要性），仅给出结论视为不合格。
-   2.3 设计形态
-       - Python 代码（可选）：若涉及技术实现，代码必须完整可运行，严禁使用占位符（如 `# TODO`）。
-       - 测试用例（可选）：若有代码，必须给出具体的测试输入和预期输出。
-       - 教学设计活动（可选）：若无代码（如社会学科），应包含具体的实现场景（如美学作品等），且必须有具体的操作步骤或评估指标。
-3. 专业品行
-   - 来源：CS2023 专业品行元素（坚持不懈、主动性、协作、有效沟通、自主学习、责任感、适应性、创新性、严谨性、敏捷应对、创造性）。
-   - 评估：检查品行元素是否与案例内容紧密结合，严禁生搬硬套。
-4. 激励、唤醒和鼓励同学们向上的途径
-   - 内容：关注学科内容与专业品行或课程思政的相关性。
-   - 评估：内容必须具体、生动，严禁空洞的口号。
-5. 习题（开放性问题）
-   - 必须包含至少一道开放性问题，且问题必须具有探究价值。
+Standard Case Structure (A teaching case must strictly include the following 6 parts):
+1. Teaching Objectives
+   - Must include Bloom's Knowledge Dimension: Factual, Conceptual, Procedural, Metacognitive Knowledge (None can be missing).
+   - Must include Bloom's Cognitive Dimension: Remember, Understand, Apply, Analyze, Evaluate, Create (None can be missing).
+2. Three Forms of Abstraction, Theory, and Design in this Case (Core part, must be expanded in detail)
+   2.1 Abstraction Form
+       - Problem Description: Must have, detailed discussion of the topic (application scenario/background/research question), only one or two sentences description is considered unqualified.
+       - Formal Model: Must have, formal tuple abstracting the research question (must be tuple form, e.g. (S, I, O, C)), and the meaning of each element must be clearly defined.
+       - Algorithm Process (Optional): If algorithm is involved, full pseudo-code or step description must be included, only listing key steps is considered incomplete.
+   2.2 Theory Form
+       - Generally includes: Principle reference, Theorem proof, Mathematical formula (Must have derivation process).
+       - Complexity Analysis: If there is an algorithm process, detailed time complexity and space complexity analysis must be present (Check correctness and necessity of formulas/theorems), only giving conclusion is considered unqualified.
+   2.3 Design Form
+       - Python Code (Optional): If technical implementation is involved, code must be complete and runnable, placeholders (like `# TODO`) are strictly prohibited.
+       - Test Cases (Optional): If there is code, specific test inputs and expected outputs must be provided.
+       - Teaching Design Activity (Optional): If no code (e.g. social subjects), specific implementation scenarios (e.g. aesthetic works etc.) should be included, and must have specific operation steps or evaluation indicators.
+3. Professional Conduct
+   - Source: CS2023 Professional Conduct Elements (Perseverance, Initiative, Collaboration, Effective Communication, Self-directed Learning, Responsibility, Adaptability, Innovation, Rigor, Agility, Creativity).
+   - Assessment: Check if conduct elements are closely integrated with case content, mechanical copying is strictly prohibited.
+4. Ways to Motivate, Awaken, and Encourage Students
+   - Content: Focus on relevance of subject content with professional conduct or curriculum ideology.
+   - Assessment: Content must be specific and vivid, empty slogans are strictly prohibited.
+5. Exercises (Open-ended Questions)
+   - Must include at least one open-ended question, and the question must have inquiry value.
 
-常见扣分项（Checklist，触犯任意一项必须扣分）：
-- [结构] 缺少上述 6 部分中任意一项：结构一致性直接扣至 3 分以下。
-- [抽象] 形式模型不是多元组形式，或缺少关键定义：概念完备性扣 1-2 分。
-- [抽象] 算法过程不完整，只写出了关键部分或伪代码不规范：概念完备性扣 1-2 分。
-- [理论] 有算法但缺失复杂度分析，或仅给出结论无推导：理论准确性扣 1-2 分。
-- [理论] 理论证明缺失或逻辑跳跃：理论准确性扣 1-2 分。
-- [设计] 有代码但缺失测试用例，或测试用例无预期输出：设计可行性扣 1-2 分。
-- [设计] 代码不完整、无法运行或包含占位符：设计可行性扣 2-3 分。
-- [内容] 存在无关内容（如无关的金融/医疗场景讨论）：主题相关性扣 1-2 分。
-- [内容] 保留了“思维链”的思考过程（如“我正在思考...”、“首先...”）：内容清晰性扣 1-2 分。
-- [内容] 问题描述过于简单（少于 100 字）、不清晰或逻辑混乱：内容清晰性扣 1-2 分。
-- [内容] 内容冗余，存在大量重复表述：内容清晰性扣 1 分。
+Common Deduction Items (Checklist, violation of any item must result in deduction):
+- [Structure] Missing any of the above 6 parts: Structure Consistency directly deducted to below 3 points.
+- [Abstraction] Formal model is not in tuple form, or missing key definitions: Concept Completeness deduct 1-2 points.
+- [Abstraction] Algorithm process incomplete, only wrote key parts or pseudo-code non-standard: Concept Completeness deduct 1-2 points.
+- [Theory] Has algorithm but missing complexity analysis, or only gives conclusion without derivation: Theory Correctness deduct 1-2 points.
+- [Theory] Theory proof missing or logic jump: Theory Correctness deduct 1-2 points.
+- [Design] Has code but missing test cases, or test cases have no expected output: Design Feasibility deduct 1-2 points.
+- [Design] Code incomplete, unable to run or contains placeholders: Design Feasibility deduct 2-3 points.
+- [Content] Existence of irrelevant content (e.g. irrelevant finance/medical scenario discussion): Topic Relevance deduct 1-2 points.
+- [Content] Retained "Chain of Thought" thinking process (e.g. "I am thinking...", "First..."): Content Clarity deduct 1-2 points.
+- [Content] Problem description too simple (less than 100 words), unclear or logically chaotic: Content Clarity deduct 1-2 points.
+- [Content] Content redundancy, existence of large amount of repetitive expressions: Content Clarity deduct 1 point.
 
-评估维度与评分标准（5分制）：
+Assessment Dimensions and Scoring Criteria (5-point scale):
 
-1) 结构一致性
-- 1分：结构严重缺失，三形态大部分缺失，其他必要部分也有较多遗漏，整体框架难以识别。
-- 2分：结构不完整，三形态有明显缺失或内容极度单薄（如仅有标题），其他部分也存在遗漏。
-- 3分：结构基本完整，三形态均有涉及但某形态内容不够充分（如形式模型不规范、代码无测试），其他部分齐全但标题或顺序有调整。
-- 4分：结构完整，三形态内容充实且层次分明，所有部分标题规范、顺序正确，仅有少量格式细节问题。
-- 5分：结构完全符合规范，三形态内容完整、深入、层次清晰，所有部分与专家案例高度一致。
+1) Structure Consistency
+- 1 point: Structure seriously missing, three forms mostly missing, other necessary parts also have many omissions, overall framework hard to identify.
+- 2 points: Structure incomplete, three forms have obvious omissions or content extremely thin (e.g. only titles), other parts also exist omissions.
+- 3 points: Structure basically complete, three forms all involved but content of some form is insufficient (e.g. formal model non-standard, code no test), other parts complete but titles or order adjusted.
+- 4 points: Structure complete, three forms content substantial and distinct levels, all parts titles standard, order correct, only minor formatting detail issues.
+- 5 points: Structure fully complies with specifications, three forms content complete, in-depth, clear levels, all parts highly consistent with expert cases.
 
-2) 主题相关性
-- 1分：内容与给定选题严重偏离，讨论了错误的领域或概念，大部分内容与主题无关。
-- 2分：内容与选题基本相关，但存在明显偏题之处（如引入了无关的场景），核心概念虽有涉及，但未能贯穿三形态始终。
-- 3分：内容总体切题，三形态均围绕选题展开，但有少量无关内容（如无关的背景介绍）或某些部分与主题关联较弱。
-- 4分：内容紧扣选题，三形态与专业品行均与主题相关，叙述始终围绕核心概念，仅有极少偏离。
-- 5分：内容高度聚焦，完全切题，从问题描述到形式模型、理论分析、设计实现、品行培养均紧密围绕选题。
+2) Topic Relevance
+- 1 point: Content seriously deviates from given topic, discusses wrong domain or concept, most content irrelevant to topic.
+- 2 points: Content basically relevant to topic, but exists obvious off-topic parts (e.g. introduced irrelevant scenarios), core concepts although involved, but failed to penetrate throughout three forms.
+- 3 points: Content generally on topic, three forms all revolve around topic, but have small amount of irrelevant content (e.g. irrelevant background introduction) or some parts weakly associated with topic.
+- 4 points: Content closely sticks to topic, three forms and professional conduct all relevant to topic, narrative always revolves around core concepts, only very few deviations.
+- 5 points: Content highly focused, completely on topic, from problem description to formal model, theoretical analysis, design implementation, conduct cultivation all closely revolve around topic.
 
-3) 内容清晰性
-- 1分：表达混乱，语句不通顺，逻辑跳跃严重，专业术语使用错误，难以理解案例内容。
-- 2分：表达较为含糊，部分语句不清晰或存在歧义，存在“思维链”残留（如“我正在思考...”），三形态之间衔接不够自然。
-- 3分：表达基本清晰，大部分内容可以理解，但存在冗余、重复或表述不够精炼之处，或存在少量格式错误。
-- 4分：表达清晰流畅，逻辑连贯，专业术语使用准确，三形态之间过渡自然，仅有少数表述可优化。
-- 5分：表达精准、简洁、流畅，逻辑严密，层次分明，专业术语规范，所有内容一目了然。
+3) Content Clarity
+- 1 point: Expression chaotic, sentences not smooth, logic jumps seriously, professional terms used incorrectly, difficult to understand case content.
+- 2 points: Expression relatively vague, some sentences unclear or ambiguous, exists "Chain of Thought" residue (e.g. "I am thinking..."), transition between three forms not natural enough.
+- 3 points: Expression basically clear, most content understandable, but exists redundancy, repetition or expression not concise enough, or exists small amount of format errors.
+- 4 points: Expression clear and smooth, logic coherent, professional terms used accurately, transition between three forms natural, only few expressions can be optimized.
+- 5 points: Expression precise, concise, smooth, logic rigorous, distinct levels, professional terms standard, all content clear at a glance.
 
-4) 概念完备性（对应抽象形态）
-- 1分：抽象形态严重缺失，无形式模型或模型完全错误，缺少算法过程，关键概念未定义。
-- 2分：抽象形态不完整，形式模型缺少关键元素（如不是多元组）或元素含义不明确，算法过程不完整或概念定义有遗漏。
-- 3分：抽象形态基本完整，有形式模型但部分元素解释不够清晰，有算法过程但步骤不够详细（如仅列出关键步骤）。
-- 4分：抽象形态较为完整，形式模型规范、元素含义明确，算法过程清晰，概念定义准确。
-- 5分：抽象形态完整且规范，形式模型严谨（多元组形式且定义完备）、算法过程详尽、概念定义准确完整，与专家案例水平相当。
+4) Concept Completeness (Corresponding to Abstraction Form)
+- 1 point: Abstraction form seriously missing, no formal model or model completely wrong, missing algorithm process, key concepts undefined.
+- 2 points: Abstraction form incomplete, formal model missing key elements (e.g. not tuple) or element meaning unclear, algorithm process incomplete or concept definition has omissions.
+- 3 points: Abstraction form basically complete, has formal model but explanation of some elements not clear enough, has algorithm process but steps not detailed enough (e.g. only list key steps).
+- 4 points: Abstraction form relatively complete, formal model standard, element meaning clear, algorithm process clear, concept definition accurate.
+- 5 points: Abstraction form complete and standard, formal model rigorous (tuple form and definition complete), algorithm process exhaustive, concept definition accurate and complete, comparable to expert case level.
 
-5) 理论准确性（对应理论形态）
-- 1分：理论形态存在严重错误，核心原理阐述错误，复杂度分析完全错误，或定理结论存在根本性谬误。
-- 2分：理论形态存在明显错误，原理理解有偏差，复杂度分析有较大出入（如仅给出错误结论），影响案例的可信度和教学价值。
-- 3分：理论形态基本正确，原理阐述大致准确但不够深入，复杂度分析合理但不够精确或缺少推导过程。
-- 4分：理论形态准确，原理阐述正确且有一定深度，复杂度分析正确并有简要推导，仅有极少瑕疵。
-- 5分：理论形态完全准确且深入，原理论证严谨，复杂度分析精确且推导完整，可作为教学参考材料。
+5) Theory Correctness (Corresponding to Theory Form)
+- 1 point: Theory form exists serious errors, core principle explanation wrong, complexity analysis completely wrong, or theorem conclusion exists fundamental fallacy.
+- 2 points: Theory form exists obvious errors, principle understanding has deviation, complexity analysis has large discrepancy (e.g. only gives wrong conclusion), affects credibility and teaching value of case.
+- 3 points: Theory form basically correct, principle explanation roughly accurate but not deep enough, complexity analysis reasonable but not precise enough or missing derivation process.
+- 4 points: Theory form accurate, principle explanation correct and has certain depth, complexity analysis correct and has brief derivation, only very few flaws.
+- 5 points: Theory form completely accurate and in-depth, principle argumentation rigorous, complexity analysis precise and derivation complete, can be used as teaching reference material.
 
-6) 设计可行性（对应设计形态）
-- 1分：设计形态严重不合理，代码存在明显逻辑错误或无法运行，教学活动设计脱离实际、不可操作。
-- 2分：设计形态有较大缺陷，代码实现不完整（如包含占位符）或有错误，教学活动设计可行性低，缺少具体操作步骤。
-- 3分：设计形态基本合理，代码逻辑大致正确但可能有小问题，缺失测试用例或运行结果，教学活动设计基本可行但不够详细。
-- 4分：设计形态合理可行，代码实现正确、结构清晰并有运行示例，教学活动设计具体、可操作性强。
-- 5分：设计形态优秀，代码规范、高效、有完整运行示例和测试，教学活动设计完整、创新、具有很强的实践指导价值。
+6) Design Feasibility (Corresponding to Design Form)
+- 1 point: Design form seriously unreasonable, code exists obvious logic errors or unable to run, teaching activity design detached from reality, inoperable.
+- 2 points: Design form has large defects, code implementation incomplete (e.g. contains placeholders) or has errors, teaching activity design feasibility low, missing specific operation steps.
+- 3 points: Design form basically reasonable, code logic roughly correct but may have small problems, missing test cases or running results, teaching activity design basically feasible but not detailed enough.
+- 4 points: Design form reasonable and feasible, code implementation correct, structure clear and has running example, teaching activity design specific, strong operability.
+- 5 points: Design form excellent, code standard, efficient, has complete running example and test, teaching activity design complete, innovative, has strong practical guidance value.
 
-打分要求：
-- 必须为每个维度给出一个 1-5 的整数分数。
-- 严禁输出 Markdown 代码块标记（如 ```json）。
-- 严禁输出任何解释、分析、推理过程或多余文本。
-- JSON 必须包含且仅包含以下 6 个字段：
+Scoring Requirements:
+- Must give an integer score of 1-5 for each dimension.
+- Strictly prohibited to output Markdown code block markers (e.g. ```json).
+- Strictly prohibited to output any explanation, analysis, reasoning process or extra text.
+- JSON must contain and only contain the following 6 fields:
   structure_consistency, topic_relevance, content_clarity, concept_completeness, theory_correctness, design_feasibility
 
-# 评分参考示例（Few-Shot）
-以下是针对“表达式求值”案例在不同生成质量下的评分参考。请仔细阅读案例表现描述与对应的评分理由，理解评分标准。
+# Scoring Reference Example (Few-Shot)
+Below are scoring references for "Expression Evaluation" case under different generation qualities. Please carefully read case performance description and corresponding scoring reasons to understand scoring criteria.
 
-【示例 1：一般质量案例】
-**案例表现**：
-- [结构] 包含教学目标、三形态等所有部分，结构基本完整。
-- [内容] 问题描述比较简洁，缺少对输入、输出以及约束条件的详细概念定义。
-- [理论] 算法过程比较完整，但完全缺少理论证明步骤或论证过程。
-- [设计] 给出了代码和测试样例，但没有给出测试运行结果。
-**参考评分**：
+【Example 1: Average Quality Case】
+**Case Performance**:
+- [Structure] Includes teaching objectives, three forms etc. all parts, structure basically complete.
+- [Content] Problem description relatively concise, missing detailed concept definition of input, output and constraints.
+- [Theory] Algorithm process relatively complete, but completely missing theoretical proof steps or argumentation process.
+- [Design] Provided code and test cases, but did not provide test running results.
+**Reference Scoring**:
 {{
-  "structure_consistency": 4,  // 结构完整，但相比完美案例在细节充实度上稍逊
-  "topic_relevance": 5,        // 内容紧扣“表达式求值”主题
-  "content_clarity": 5,        // 语言表达清晰流畅
-  "concept_completeness": 3,   // 扣分点：缺少输入输出约束定义
-  "theory_correctness": 3,     // 扣分点：缺失证明/论证步骤
-  "design_feasibility": 3      // 扣分点：缺运行结果，验证性不足
+  "structure_consistency": 4,  // Structure complete, but slightly inferior in detail fullness compared to perfect case
+  "topic_relevance": 5,        // Content closely sticks to "Expression Evaluation" topic
+  "content_clarity": 5,        // Language expression clear and smooth
+  "concept_completeness": 3,   // Deduction point: Missing input/output constraint definition
+  "theory_correctness": 3,     // Deduction point: Missing proof/argumentation steps
+  "design_feasibility": 3      // Deduction point: Missing running results, verification insufficient
 }}
 
-【示例 2：较差质量案例】
-**案例表现**：
-- [结构] 问题描述仅有一句话，内容极度单薄；算法过程不完整，只写出了关键部分。
-- [内容] 讨论中夹杂了无关的金融场景讨论；正文中保留了“思维链”的思考过程（如“我正在思考...”），导致阅读不通顺。
-- [设计] 无代码，无测试用例，仅列出了一些关键参数。
-**参考评分**：
+【Example 2: Poor Quality Case】
+**Case Performance**:
+- [Structure] Problem description only one sentence, content extremely thin; algorithm process incomplete, only wrote key parts.
+- [Content] Discussion mixed with irrelevant finance scenario discussion; text retained "Chain of Thought" thinking process (e.g. "I am thinking..."), causing reading not smooth.
+- [Design] No code, no test cases, only listed some key parameters.
+**Reference Scoring**:
 {{
-  "structure_consistency": 3,  // 结构虽全但内容单薄，不够严谨
-  "topic_relevance": 4,        // 金融场景讨论导致轻微偏题
-  "content_clarity": 4,        // 思维链残留影响了内容的纯净度和逻辑流畅性
-  "concept_completeness": 2,   // 严重扣分点：描述太简略，算法不全
-  "theory_correctness": 3,     // 理论阐述不够深入
-  "design_feasibility": 2      // 严重扣分点：无代码无测试，几乎不可行
+  "structure_consistency": 3,  // Structure although full but content thin, not rigorous enough
+  "topic_relevance": 4,        // Finance scenario discussion caused slight off-topic
+  "content_clarity": 4,        // Chain of Thought residue affected content purity and logic smoothness
+  "concept_completeness": 2,   // Serious deduction point: Description too brief, algorithm incomplete
+  "theory_correctness": 3,     // Theory explanation not deep enough
+  "design_feasibility": 2      // Serious deduction point: No code no test, almost infeasible
 }}
 
-【示例 3：高质量案例】
-**案例表现**：
-- [结构] 结构非常完整，层次分明，内容详实。
-- [内容] 问题描述详细，概念定义（输入/输出/约束）完善；包含完整的算法伪代码。
-- [理论] 严格包含证明步骤和复杂度分析，理论论证严谨。
-- [设计] 包含完整代码、详细测试用例以及对应的运行结果。
-**参考评分**：
+【Example 3: High Quality Case】
+**Case Performance**:
+- [Structure] Structure very complete, distinct levels, content substantial.
+- [Content] Problem description detailed, concept definition (input/output/constraints) perfect; includes complete algorithm pseudo-code.
+- [Theory] Strictly includes proof steps and complexity analysis, theoretical argumentation rigorous.
+- [Design] Includes complete code, detailed test cases and corresponding running results.
+**Reference Scoring**:
 {{
-  "structure_consistency": 5,  // 结构完美，符合专家标准
-  "topic_relevance": 5,        // 高度聚焦
-  "content_clarity": 5,        // 表达精准
-  "concept_completeness": 5,   // 概念完备，伪代码清晰
-  "theory_correctness": 5,     // 理论准确且深入
-  "design_feasibility": 5      // 设计完备，可操作性强
+  "structure_consistency": 5,  // Structure perfect, meets expert standard
+  "topic_relevance": 5,        // Highly focused
+  "content_clarity": 5,        // Expression precise
+  "concept_completeness": 5,   // Concept complete, pseudo-code clear
+  "theory_correctness": 5,     // Theory accurate and in-depth
+  "design_feasibility": 5      // Design complete, strong operability
 }}
 
-输入信息：
-学科领域：{domain}
-案例选题：{topic}
+Input Information:
+Domain: {domain}
+Case Topic: {topic}
 
-待评估案例正文（可能为Markdown）：
+Case Text to be Evaluated (Possibly Markdown):
 {case_content}'''
 
 
 def get_eval_prompt(domain: str, topic: str, case_content: str, **kwargs) -> str:
     return EVAL_PROMPT.format(domain=domain, topic=topic, case_content=case_content)
-

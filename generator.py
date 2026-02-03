@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-案例生成器
-支持单个测试和批量生成
+Case Generator
+Supports single test and batch generation
 
-使用方法:
-    # 测试单个案例
-    python generator.py --domain SE --topic "日历生成器" --model qwen
+Usage:
+    # Test single case
+    python generator.py --domain SE --topic "Calendar Generator" --model qwen
     
-    # 生成一个领域的所有案例
+    # Generate all cases for a domain
     python generator.py --domain SE --model qwen --all
     
-    # 列出选题
+    # List topics
     python generator.py --domain SE --list-topics
 """
 
@@ -24,13 +24,13 @@ from datetime import datetime
 from pathlib import Path
 from openai import OpenAI
 
-# 导入配置和提示模板
+# Import config and prompt templates
 from config import API_KEY, BASE_URL, GEN_MODELS, DOMAINS, EXAMPLE_FILES, EXAMPLE_TOPICS
 from prompts import get_simple_prompt, get_cot_prompt, get_gjmz_stage1_prompt, get_gjmz_stage2_prompt
 
 
 class TokenStats:
-    """Token统计类"""
+    """Token Statistics Class"""
     def __init__(self):
         self.records = []
     
@@ -61,10 +61,10 @@ class CaseGenerator:
         self.token_stats = TokenStats()
         
     def call_api(self, prompt: str, method: str, stage: str = "main", max_retries: int = 3) -> str:
-        """调用API生成内容"""
+        """Call API to generate content"""
         for attempt in range(max_retries):
             try:
-                print(f"  [API调用] {method}/{stage} 第{attempt + 1}次尝试...")
+                print(f"  [API Call] {method}/{stage} Attempt {attempt + 1}...")
                 
                 response = self.client.chat.completions.create(
                     model=self.model_name,
@@ -73,81 +73,81 @@ class CaseGenerator:
                     max_tokens=8000,
                 )
                 
-                # 检查错误
+                # Check for errors
                 if hasattr(response, 'error') and response.error:
-                    raise Exception(f"API返回错误: {response.error}")
+                    raise Exception(f"API returned error: {response.error}")
                 
-                # 检查choices
+                # Check choices
                 if not response.choices:
-                    raise Exception("response.choices 为空")
+                    raise Exception("response.choices is empty")
                 
                 content = response.choices[0].message.content
                 if content is None:
-                    raise Exception("响应内容为空")
+                    raise Exception("Response content is empty")
                 
-                # 统计token
+                # Count tokens
                 input_tokens = response.usage.prompt_tokens if response.usage else 0
                 output_tokens = response.usage.completion_tokens if response.usage else 0
                 self.token_stats.add(method, stage, input_tokens, output_tokens)
                 
-                print(f"  [API调用] 成功 | 输入:{input_tokens} 输出:{output_tokens} | 内容:{len(content)}字符")
+                print(f"  [API Call] Success | Input:{input_tokens} Output:{output_tokens} | Content:{len(content)} chars")
                 return content
                 
             except Exception as e:
-                print(f"  [API调用] 失败: {e}")
+                print(f"  [API Call] Failed: {e}")
                 if attempt < max_retries - 1:
                     wait_time = (attempt + 1) * 5
-                    print(f"  [API调用] 等待{wait_time}秒后重试...")
+                    print(f"  [API Call] Waiting {wait_time} seconds before retry...")
                     time.sleep(wait_time)
                 else:
                     raise e
     
     def reset_stats(self):
-        """重置token统计"""
+        """Reset token statistics"""
         self.token_stats = TokenStats()
     
     def generate_simple(self, domain: str, topic: str) -> str:
-        """简单提示生成（不使用专家案例）"""
-        print("\n[简单提示] 开始生成...")
+        """Simple prompt generation (No expert example)"""
+        print("\n[Simple Prompt] Start generating...")
         prompt = get_simple_prompt(domain=domain, topic=topic)
         result = self.call_api(prompt, "simple")
-        print("[简单提示] 生成完成")
+        print("[Simple Prompt] Generation completed")
         return result
     
     def generate_cot(self, domain: str, topic: str, example_domain: str,
                      example_topic: str, example_content: str) -> str:
-        """思维链提示生成"""
-        print("\n[思维链提示] 开始生成...")
+        """Chain-of-Thought prompt generation"""
+        print("\n[CoT Prompt] Start generating...")
         prompt = get_cot_prompt(domain, topic, example_domain, example_topic, example_content)
         result = self.call_api(prompt, "cot")
-        print("[思维链提示] 生成完成")
+        print("[CoT Prompt] Generation completed")
         return result
     
     def generate_gjmz(self, domain: str, topic: str, example_domain: str,
                       example_topic: str, example_content: str) -> tuple:
-        """纲举目张法生成（两阶段）"""
-        print("\n[纲举目张法] 开始第一阶段：生成纲要...")
+        """Outline-Detail (GJMZ) generation (Two stages)"""
+        print("\n[GJMZ Method] Start Stage 1: Generate Outline...")
         stage1_prompt = get_gjmz_stage1_prompt(domain, topic, example_domain, example_topic, example_content)
         outline = self.call_api(stage1_prompt, "gjmz", "stage1")
-        print("[纲举目张法] 第一阶段完成")
+        print("[GJMZ Method] Stage 1 completed")
         
-        print("[纲举目张法] 开始第二阶段：生成完整案例...")
+        print("[GJMZ Method] Start Stage 2: Generate Complete Case...")
         stage2_prompt = get_gjmz_stage2_prompt(domain, topic, example_domain, example_topic, example_content, outline)
         case_content = self.call_api(stage2_prompt, "gjmz", "stage2")
-        print("[纲举目张法] 第二阶段完成")
+        print("[GJMZ Method] Stage 2 completed")
         
         return outline, case_content
 
 
 def load_example_case(examples_dir: str, domain_key: str) -> str:
-    """加载对应领域的专家案例"""
+    """Load expert case for corresponding domain"""
     example_file = os.path.join(examples_dir, EXAMPLE_FILES[domain_key])
     with open(example_file, 'r', encoding='utf-8') as f:
         return f.read()
 
 
 def load_topics(data_dir: str, domain_key: str) -> list:
-    """加载某个领域的所有选题"""
+    """Load all topics for a certain domain"""
     topic_file = os.path.join(data_dir, domain_key, f"{domain_key}.txt")
     with open(topic_file, 'r', encoding='utf-8') as f:
         topics = [line.strip() for line in f if line.strip()]
@@ -157,14 +157,14 @@ def load_topics(data_dir: str, domain_key: str) -> list:
 def save_output(output_dir: str, model: str, method: str, domain: str, 
                 topic: str, content: str, is_outline: bool = False):
     """
-    保存生成结果
-    输出结构: outputs/{model}/{method}/{domain}/{topic}.md
+    Save generation result
+    Output structure: outputs/{model}/{method}/{domain}/{topic}.md
     """
-    # 创建输出目录
+    # Create output directory
     case_dir = os.path.join(output_dir, model, method, domain)
     os.makedirs(case_dir, exist_ok=True)
     
-    # 文件名
+    # Filename
     safe_topic = topic.replace('/', '_').replace('\\', '_').replace(' ', '_').replace(':', '_')
     suffix = "_outline" if is_outline else ""
     filename = f"{safe_topic}{suffix}.md"
@@ -173,14 +173,14 @@ def save_output(output_dir: str, model: str, method: str, domain: str,
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print(f"  [保存] {filepath}")
+    print(f"  [Save] {filepath}")
     return filepath
 
 
 def generate_single_case(generator: CaseGenerator, domain_key: str, topic: str,
                          example_content: str, model_key: str, output_dir: str,
                          method: str = 'all') -> dict:
-    """生成单个案例的指定方法"""
+    """Generate single case with specified method"""
     domain = DOMAINS[domain_key]
     example_domain = DOMAINS[domain_key]
     example_topic = EXAMPLE_TOPICS[domain_key]
@@ -188,10 +188,10 @@ def generate_single_case(generator: CaseGenerator, domain_key: str, topic: str,
     results = {}
     generator.reset_stats()
     
-    # 确定要运行的方法
+    # Determine methods to run
     methods_to_run = ['simple', 'cot', 'gjmz'] if method == 'all' else [method]
     
-    # 1. 简单提示
+    # 1. Simple Prompt
     if 'simple' in methods_to_run:
         try:
             start_time = time.time()
@@ -200,10 +200,10 @@ def generate_single_case(generator: CaseGenerator, domain_key: str, topic: str,
             save_output(output_dir, model_key, "simple", domain_key, topic, simple_result)
             results['simple'] = {'success': True, 'time': simple_time, 'length': len(simple_result)}
         except Exception as e:
-            print(f"[简单提示] 失败: {e}")
+            print(f"[Simple Prompt] Failed: {e}")
             results['simple'] = {'success': False, 'error': str(e)}
     
-    # 2. 思维链提示
+    # 2. CoT Prompt
     if 'cot' in methods_to_run:
         try:
             start_time = time.time()
@@ -212,10 +212,10 @@ def generate_single_case(generator: CaseGenerator, domain_key: str, topic: str,
             save_output(output_dir, model_key, "cot", domain_key, topic, cot_result)
             results['cot'] = {'success': True, 'time': cot_time, 'length': len(cot_result)}
         except Exception as e:
-            print(f"[思维链提示] 失败: {e}")
+            print(f"[CoT Prompt] Failed: {e}")
             results['cot'] = {'success': False, 'error': str(e)}
     
-    # 3. 纲举目张法
+    # 3. GJMZ Method
     if 'gjmz' in methods_to_run:
         try:
             start_time = time.time()
@@ -225,10 +225,10 @@ def generate_single_case(generator: CaseGenerator, domain_key: str, topic: str,
             save_output(output_dir, model_key, "gjmz", domain_key, topic, gjmz_result)
             results['gjmz'] = {'success': True, 'time': gjmz_time, 'length': len(gjmz_result), 'outline_length': len(outline)}
         except Exception as e:
-            print(f"[纲举目张法] 失败: {e}")
+            print(f"[GJMZ Method] Failed: {e}")
             results['gjmz'] = {'success': False, 'error': str(e)}
     
-    # Token统计
+    # Token Statistics
     results['token_stats'] = generator.token_stats.summary()
     
     return results
@@ -237,49 +237,49 @@ def generate_single_case(generator: CaseGenerator, domain_key: str, topic: str,
 def run_single_test(domain_key: str, topic: str, model_key: str, 
                     examples_dir: str, data_dir: str, output_dir: str,
                     method: str = 'all'):
-    """运行单个测试"""
+    """Run single test"""
     print("=" * 60)
-    print(f"案例生成测试")
+    print(f"Case Generation Test")
     print("=" * 60)
-    print(f"领域: {domain_key} ({DOMAINS[domain_key]})")
-    print(f"选题: {topic}")
-    print(f"模型: {model_key} ({GEN_MODELS[model_key]})")
-    print(f"方法: {method}")
-    print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Domain: {domain_key} ({DOMAINS[domain_key]})")
+    print(f"Topic: {topic}")
+    print(f"Model: {model_key} ({GEN_MODELS[model_key]})")
+    print(f"Method: {method}")
+    print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
     
-    # 加载专家案例
-    print("\n[准备] 加载专家案例...")
+    # Load expert case
+    print("\n[Prepare] Loading expert case...")
     example_content = load_example_case(examples_dir, domain_key)
-    print(f"[准备] 专家案例加载完成，长度: {len(example_content)}字符")
+    print(f"[Prepare] Expert case loaded, length: {len(example_content)} chars")
     
-    # 初始化生成器
+    # Initialize generator
     model_name = GEN_MODELS[model_key]
-    print(f"\n[准备] 初始化API客户端 ({model_name})...")
+    print(f"\n[Prepare] Initializing API client ({model_name})...")
     generator = CaseGenerator(API_KEY, BASE_URL, model_name)
     
-    # 生成案例
+    # Generate case
     results = generate_single_case(generator, domain_key, topic, example_content, model_key, output_dir, method)
     
-    # 打印结果汇总
+    # Print result summary
     print("\n" + "=" * 60)
-    print("生成结果汇总")
+    print("Generation Result Summary")
     print("=" * 60)
     for m in ['simple', 'cot', 'gjmz']:
         result = results.get(m, {})
         if not result:
             continue
         if result.get('success'):
-            print(f"{m:10s}: 成功 | 耗时: {result['time']:.1f}秒 | 长度: {result['length']}字符")
+            print(f"{m:10s}: Success | Time: {result['time']:.1f}s | Length: {result['length']} chars")
         else:
-            print(f"{m:10s}: 失败 | 错误: {result.get('error', 'Unknown')}")
+            print(f"{m:10s}: Failed | Error: {result.get('error', 'Unknown')}")
     
-    # Token统计
+    # Token Statistics
     token_stats = results.get('token_stats', {})
     print("-" * 60)
-    print(f"Token统计: 输入={token_stats.get('total_input_tokens', 0)} | "
-          f"输出={token_stats.get('total_output_tokens', 0)} | "
-          f"总计={token_stats.get('total_tokens', 0)}")
+    print(f"Token Stats: Input={token_stats.get('total_input_tokens', 0)} | "
+          f"Output={token_stats.get('total_output_tokens', 0)} | "
+          f"Total={token_stats.get('total_tokens', 0)}")
     print("=" * 60)
     
     return results
@@ -288,43 +288,43 @@ def run_single_test(domain_key: str, topic: str, model_key: str,
 def run_batch_generation(domain_key: str, model_key: str,
                          examples_dir: str, data_dir: str, output_dir: str,
                          method: str = 'all'):
-    """批量生成一个领域的所有案例"""
+    """Batch generate all cases for a domain"""
     print("=" * 60)
-    print(f"批量案例生成")
+    print(f"Batch Case Generation")
     print("=" * 60)
-    print(f"领域: {domain_key} ({DOMAINS[domain_key]})")
-    print(f"模型: {model_key} ({GEN_MODELS[model_key]})")
-    print(f"方法: {method}")
-    print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Domain: {domain_key} ({DOMAINS[domain_key]})")
+    print(f"Model: {model_key} ({GEN_MODELS[model_key]})")
+    print(f"Method: {method}")
+    print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
     
-    # 加载选题列表
+    # Load topics
     topics = load_topics(data_dir, domain_key)
-    print(f"\n[准备] 共 {len(topics)} 个选题待生成")
+    print(f"\n[Prepare] Total {len(topics)} topics to generate")
     
-    # 加载专家案例
-    print("[准备] 加载专家案例...")
+    # Load expert case
+    print("[Prepare] Loading expert case...")
     example_content = load_example_case(examples_dir, domain_key)
     
-    # 初始化生成器
+    # Initialize generator
     model_name = GEN_MODELS[model_key]
     generator = CaseGenerator(API_KEY, BASE_URL, model_name)
     
-    # 批量生成
+    # Batch generation
     all_results = {}
     total_tokens = {'input': 0, 'output': 0}
     success_count = {'simple': 0, 'cot': 0, 'gjmz': 0}
     
     for i, topic in enumerate(topics, 1):
         print(f"\n{'='*60}")
-        print(f"[{i}/{len(topics)}] 生成: {topic}")
+        print(f"[{i}/{len(topics)}] Generating: {topic}")
         print('='*60)
         
         try:
             results = generate_single_case(generator, domain_key, topic, example_content, model_key, output_dir, method)
             all_results[topic] = results
             
-            # 统计
+            # Statistics
             token_stats = results.get('token_stats', {})
             total_tokens['input'] += token_stats.get('total_input_tokens', 0)
             total_tokens['output'] += token_stats.get('total_output_tokens', 0)
@@ -334,13 +334,13 @@ def run_batch_generation(domain_key: str, model_key: str,
                     success_count[m] += 1
                     
         except Exception as e:
-            print(f"[错误] 生成失败: {e}")
+            print(f"[Error] Generation Failed: {e}")
             all_results[topic] = {'error': str(e)}
         
-        # 避免请求过快
+        # Avoid rate limiting
         time.sleep(1)
     
-    # 保存汇总结果
+    # Save summary result
     summary = {
         'domain': domain_key,
         'model': model_key,
@@ -355,56 +355,56 @@ def run_batch_generation(domain_key: str, model_key: str,
     with open(summary_path, 'w', encoding='utf-8') as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
     
-    # 打印总结
+    # Print summary
     print("\n" + "=" * 60)
-    print("批量生成完成")
+    print("Batch Generation Completed")
     print("=" * 60)
-    print(f"总选题数: {len(topics)}")
-    print(f"成功数量: simple={success_count['simple']} | cot={success_count['cot']} | gjmz={success_count['gjmz']}")
-    print(f"Token总计: 输入={total_tokens['input']} | 输出={total_tokens['output']} | 总={total_tokens['input']+total_tokens['output']}")
-    print(f"汇总文件: {summary_path}")
+    print(f"Total Topics: {len(topics)}")
+    print(f"Success Count: simple={success_count['simple']} | cot={success_count['cot']} | gjmz={success_count['gjmz']}")
+    print(f"Total Tokens: Input={total_tokens['input']} | Output={total_tokens['output']} | Total={total_tokens['input']+total_tokens['output']}")
+    print(f"Summary File: {summary_path}")
     print("=" * 60)
     
     return summary
 
 
 def main():
-    parser = argparse.ArgumentParser(description='教学案例生成器')
+    parser = argparse.ArgumentParser(description='Teaching Case Generator')
     parser.add_argument('--domain', type=str, default='SE', 
                         choices=list(DOMAINS.keys()),
-                        help='领域代码')
-    parser.add_argument('--topic', type=str, default='日历生成器',
-                        help='案例选题')
+                        help='Domain Code')
+    parser.add_argument('--topic', type=str, default='Calendar Generator',
+                        help='Case Topic')
     parser.add_argument('--model', type=str, default='qwen',
                         choices=list(GEN_MODELS.keys()),
-                        help='模型代码')
+                        help='Model Code')
     parser.add_argument('--examples-dir', type=str, default='examples',
-                        help='专家案例目录')
+                        help='Expert Examples Directory')
     parser.add_argument('--data-dir', type=str, default='data',
-                        help='数据目录')
+                        help='Data Directory')
     parser.add_argument('--output-dir', type=str, default='outputs',
-                        help='输出目录')
+                        help='Output Directory')
     parser.add_argument('--list-topics', action='store_true',
-                        help='列出指定领域的所有选题')
+                        help='List all topics in specified domain')
     parser.add_argument('--all', action='store_true',
-                        help='生成指定领域的所有案例')
+                        help='Generate all cases for specified domain')
     parser.add_argument('--method', type=str, default='all',
                         choices=['simple', 'cot', 'gjmz', 'all'],
-                        help='指定生成方法（默认all生成全部三种）')
+                        help='Specify generation method (default all generates all three)')
     
     args = parser.parse_args()
     
-    # 列出选题
+    # List topics
     if args.list_topics:
         topics = load_topics(args.data_dir, args.domain)
-        print(f"\n{args.domain} ({DOMAINS[args.domain]}) 领域的选题列表:")
+        print(f"\nTopic List for {args.domain} ({DOMAINS[args.domain]}):")
         print("-" * 40)
         for i, topic in enumerate(topics, 1):
             print(f"{i:3d}. {topic}")
-        print(f"\n共 {len(topics)} 个选题")
+        print(f"\nTotal {len(topics)} topics")
         return
     
-    # 批量生成
+    # Batch generation
     if args.all:
         run_batch_generation(
             domain_key=args.domain,
@@ -415,7 +415,7 @@ def main():
             method=args.method
         )
     else:
-        # 单个测试
+        # Single test
         run_single_test(
             domain_key=args.domain,
             topic=args.topic,

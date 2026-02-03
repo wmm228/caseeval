@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-批量评估脚本
+Batch Evaluation Script
 
-输出结构：
+Output Structure:
 {output_root}/{model}/{method}/{domain}/{eval_model}.jsonl
-每一行是一个案例的评估结果 JSON（包含元信息与 6 个分数）。
+Each line is a JSON object of a case's evaluation result (containing meta-info and 6 scores).
 """
 
 import argparse
@@ -119,12 +119,12 @@ def extract_first_json_object(text: str) -> Optional[str]:
 def extract_scores_from_text(text: str) -> Optional[Dict[str, int]]:
     cn_map = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5}
     labels: Dict[str, Tuple[str, ...]] = {
-        "structure_consistency": ("structure_consistency", "结构一致性"),
-        "topic_relevance": ("topic_relevance", "主题相关性"),
-        "content_clarity": ("content_clarity", "内容清晰性"),
-        "concept_completeness": ("concept_completeness", "概念完备性"),
-        "theory_correctness": ("theory_correctness", "理论准确性"),
-        "design_feasibility": ("design_feasibility", "设计可行性"),
+        "structure_consistency": ("structure_consistency", "Structure Consistency", "结构一致性"),
+        "topic_relevance": ("topic_relevance", "Topic Relevance", "主题相关性"),
+        "content_clarity": ("content_clarity", "Content Clarity", "内容清晰性"),
+        "concept_completeness": ("concept_completeness", "Concept Completeness", "概念完备性"),
+        "theory_correctness": ("theory_correctness", "Theory Correctness", "理论准确性"),
+        "design_feasibility": ("design_feasibility", "Design Feasibility", "设计可行性"),
     }
 
     found: Dict[str, int] = {}
@@ -242,7 +242,7 @@ def call_eval_api(
                 # Retry with json_object just in case? Or just retry?
                 # Actually, user said "instruction following problem".
                 # Maybe we should try to add "JSON" to the prompt start?
-                # But prompt already has "只输出 JSON".
+                # But prompt already has "Output only JSON".
                 pass
             
             if not content.strip():
@@ -376,24 +376,24 @@ def evaluate_cases(
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="教学案例自动评估脚本（输出jsonl）")
-    parser.add_argument("--input-root", type=str, default="outputs", help="生成案例根目录")
-    parser.add_argument("--output-root", type=str, default="auto_eval", help="评估结果根目录")
+    parser = argparse.ArgumentParser(description="Automatic Teaching Case Evaluation Script (Output jsonl)")
+    parser.add_argument("--input-root", type=str, default="outputs", help="Generated cases root directory")
+    parser.add_argument("--output-root", type=str, default="auto_eval", help="Evaluation results root directory")
 
-    parser.add_argument("--model", type=str, required=True, help="被评估的生成模型代码（如 doubao）")
-    parser.add_argument("--method", type=str, required=True, choices=["simple", "cot", "gjmz"], help="生成方法")
-    parser.add_argument("--domain", type=str, required=True, choices=list(DOMAINS.keys()), help="领域代码")
+    parser.add_argument("--model", type=str, required=True, help="Generated model code to be evaluated (e.g. doubao)")
+    parser.add_argument("--method", type=str, required=True, choices=["simple", "cot", "gjmz"], help="Generation method")
+    parser.add_argument("--domain", type=str, required=True, choices=list(DOMAINS.keys()), help="Domain code")
 
-    parser.add_argument("--eval-model", type=str, required=True, help="评估模型代码或模型名称")
-    parser.add_argument("--eval-model-label", type=str, default="", help="评估模型标识（写入jsonl与文件名）")
+    parser.add_argument("--eval-model", type=str, required=True, help="Evaluation model code or name")
+    parser.add_argument("--eval-model-label", type=str, default="", help="Evaluation model label (written to jsonl and filename)")
 
-    parser.add_argument("--max-cases", type=int, default=None, help="最多评估多少个案例")
-    parser.add_argument("--dry-run", action="store_true", help="只扫描不调用模型不写文件")
-    parser.add_argument("--no-resume", action="store_true", help="不读取已有jsonl跳过已评估topic")
+    parser.add_argument("--max-cases", type=int, default=None, help="Maximum number of cases to evaluate")
+    parser.add_argument("--dry-run", action="store_true", help="Scan only, do not call model, do not write files")
+    parser.add_argument("--no-resume", action="store_true", help="Do not read existing jsonl, do not skip evaluated topics")
 
-    parser.add_argument("--max-retries", type=int, default=3, help="失败重试次数")
-    parser.add_argument("--sleep", type=float, default=1.0, help="调用间隔秒数（含重试退避基数）")
-    parser.add_argument("--max-tokens", type=int, default=300, help="评估输出最大token")
+    parser.add_argument("--max-retries", type=int, default=3, help="Number of retries on failure")
+    parser.add_argument("--sleep", type=float, default=1.0, help="Call interval seconds (including retry backoff base)")
+    parser.add_argument("--max-tokens", type=int, default=300, help="Max tokens for evaluation output")
     return parser.parse_args()
 
 
@@ -423,13 +423,13 @@ def main() -> None:
 
     out_path = build_output_path(output_root, args.model, args.method, args.domain, eval_model_label)
     print("=" * 60)
-    print("自动评估完成")
+    print("Automatic Evaluation Completed")
     print("=" * 60)
-    print(f"输入目录: {input_root}")
-    print(f"输出文件: {out_path}")
-    print(f"评估模型: {eval_model_key} -> {EVAL_MODELS.get(eval_model_key, eval_model_key)}")
-    print(f"处理数量: {processed}")
-    print(f"跳过数量: {skipped}")
+    print(f"Input Directory: {input_root}")
+    print(f"Output File: {out_path}")
+    print(f"Eval Model: {eval_model_key} -> {EVAL_MODELS.get(eval_model_key, eval_model_key)}")
+    print(f"Processed: {processed}")
+    print(f"Skipped: {skipped}")
     print("=" * 60)
 
 
@@ -443,4 +443,3 @@ if __name__ == "__main__":
         except Exception:
             pass
     main()
-

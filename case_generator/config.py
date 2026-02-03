@@ -1,12 +1,11 @@
 # config.py
-# API配置和模型列表
+# API Configuration and Model List
 
-# API配置
-API_KEY = "sk-9ZxzEXFBPm3NqguTGE3AQtma8EU4DrMxrAljxVwlJHyM1Xtm"  # 替换为你的API key
-# API_KEY = "sk-HfR6iCIlpzt2qJcWsKnKJBcm9e193ofSimofkq6VTqHfJ9pw"  # 替换为你的API key
-BASE_URL = "https://api.agicto.cn/v1"
+# API Configuration
+API_KEY = ""  # Replace with your API key
+BASE_URL = ""
 
-# 生成模型列表（使用普通模型，避免thinking模型的特殊参数问题）
+# Generation Model List (Use standard models to avoid special parameter issues with thinking models)
 GEN_MODELS = {
     "qwen": "qwen3-next-80b-a3b-instruct",
     "ernie": "ernie-x1-turbo-32k",
@@ -16,7 +15,7 @@ GEN_MODELS = {
     "glm": "glm-4-plus",
 }
 
-# 评估模型列表
+# Evaluation Model List
 EVAL_MODELS = {
     "gpt-5": "gpt-5.1",
     "gemini-3": "gemini-3-pro-preview",
@@ -24,17 +23,17 @@ EVAL_MODELS = {
     "kimi-k2": "kimi-k2-0711-preview",
 }
 
-# 领域映射（文件夹名 -> 中文名）
+# Domain Mapping (Folder name -> English name)
 DOMAINS = {
-    "SE": "软件工程",
-    "AI": "人工智能",
-    "Algorithm": "算法基础",
-    "Architecture": "体系结构与组织",
-    "DataManagement": "数据管理",
-    "Society": "社会、伦理与职业化",
+    "SE": "Software Engineering",
+    "AI": "Artificial Intelligence",
+    "Algorithm": "Algorithmic Foundations",
+    "Architecture": "Architecture and Organization",
+    "DataManagement": "Data Management",
+    "Society": "Society, Ethics and Professionalism",
 }
 
-# 专家案例文件映射（领域代码 -> 文件名）
+# Expert Example File Mapping (Domain code -> Filename)
 EXAMPLE_FILES = {
     "SE": "SE_example.md",
     "AI": "AI_example.md",
@@ -44,15 +43,15 @@ EXAMPLE_FILES = {
     "Society": "Society_example.md",
 }
 
-# 专家案例选题（用于提示中显示）
+# Expert Example Topics (For display in prompts)
 EXAMPLE_TOPICS = {
-    "SE": "数据分析库性能测试程序",
-    "AI": "智能驾驶中的卡尔曼滤波形式模型与算法",
-    "Algorithm": "求最小生成树的Prim形式模型与算法",
-    "Architecture": "Base64邮件编码",
-    "DataManagement": "二十大报告中英文文本信息熵计算",
-    "Society": "计算机科技史：创新与发展中的中国力量",
+    "SE": "Performance Testing Program for Data Analysis Library",
+    "AI": "Kalman Filter Formal Model and Algorithm in Intelligent Driving",
+    "Algorithm": "Prim's Formal Model and Algorithm for Minimum Spanning Tree",
+    "Architecture": "Base64 Email Encoding",
+    "DataManagement": "Information Entropy Calculation of Chinese and English Text in the 20th National Congress Report",
+    "Society": "History of Computer Science and Technology: Chinese Power in Innovation and Development",
 }
 
-# 提示方法
+# Prompt Methods
 PROMPT_METHODS = ["simple", "cot", "gjmz"]
